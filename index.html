@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Myanmar Food Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- html2canvas for capturing DOM content as an image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #fefcf5;
+            color: #4a2c2a;
+            margin: 0;
+            padding: 2rem;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        /* Utility Classes */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .flex-between {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Responsive Layout */
+        @media (min-width: 640px) {
+            body {
+                padding: 4rem 2rem;
+            }
+        }
+        
+        /* Header and Navigation */
+        header {
+            padding: 1rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .logo-image-container {
+            width: 100%;
+            height: 150px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 1rem;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+        }
+        
+        .logo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .creator-info {
+            font-size: 1rem;
+            color: #8b9a5e;
+            text-align: center;
+            margin-top: 0.25rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-primary {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background: #4b5563;
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: #374151;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .lang-btn {
+            background: #d6ccb2;
+            color: #4a2c2a;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .lang-btn:hover {
+            background: #c7bca1;
+        }
+
+        .category-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            color: #4a2c2a;
+            white-space: nowrap;
+            border: 2px solid transparent;
+        }
+
+        .category-btn.active {
+            background-color: #8b9a5e;
+            color: #ffffff;
+            border: 2px solid #6a493b;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding-bottom: 0.5rem;
+        }
+
+        /* Main Content */
+        .view {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .home-content {
+            font-size: 1.5rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        @media (min-width: 640px) {
+            .home-content {
+                font-size: 2rem;
+            }
+        }
+
+        .recipe-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+
+        @media (min-width: 640px) {
+            .recipe-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 768px) {
+            .recipe-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .recipe-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        .recipe-card {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+            cursor: pointer;
+            overflow: hidden;
+            border: 1px solid #e2d8b5;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .recipe-card-img {
+            width: 100%;
+            height: 10rem;
+            object-fit: cover;
+            border-radius: 1rem 1rem 0 0;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #fefcf5;
+            color: #4a2c2a;
+            max-width: 40rem;
+            width: 100%;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow-y: auto;
+            max-height: 95vh;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #e5e7eb;
+            padding: 0.5rem;
+            border-radius: 9999px;
+            cursor: pointer;
+        }
+
+        .modal-close-btn:hover {
+            background: #d1d5db;
+        }
+    </style>
+</head>
+<body class="container">
+
+    <!-- Header Section -->
+    <header>
+        <h1 class="font-playfair" style="font-size: 2.5rem; font-weight: 700; color: #4a2c2a; margin: 0; padding-bottom: 0.5rem;" data-en="Myanmar Food Guide" data-my="မြန်မာ့အစားအစာလမ်းညွှန်">Myanmar Food Guide</h1>
+        <p class="creator-info" data-en="Creator: Htoo Aung Hlaing Win | ID: 240702403787" data-my="ဖန်တီးသူ: ထူးအောင်လှိုင်ဝင်း | ID: 240702403787">Creator: Htoo Aung Hlaing Win | ID: 240702403787</p>
+
+        <!-- Desktop Navigation Menu -->
+        <nav class="desktop-nav" style="margin-top: 1rem;">
+            <button id="home-btn-desktop" class="btn btn-secondary" data-en="Home" data-my="မူလစာမျက်နှာ">Home</button>
+        </nav>
+    </header>
+    
+    <!-- Home View -->
+    <main id="home-view" class="view active flex-center" style="min-height: calc(100vh - 10rem);">
+        <div class="flex-center" style="flex-direction: column;">
+            <p class="home-content" data-en="Discover the rich and delicious world of Myanmar cuisine." data-my="မြန်မာ့အစားအစာရဲ့ ကြွယ်ဝပြီး အရသာရှိတဲ့ကမ္ဘာကို ရှာဖွေလိုက်ပါ။">Discover the rich and delicious world of Myanmar cuisine.</p>
+            <div class="flex-center" style="gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
+                <button id="start-btn" class="btn btn-primary" data-en="Get Started" data-my="စတင်လိုက်ပါ">Get Started</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Recipes View -->
+    <section id="recipes-view" class="view">
+        <!-- Filter Section -->
+        <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; gap: 1rem; align-items: center; justify-content: flex-end;">
+                <button id="lang-toggle-btn" class="lang-btn" aria-label="Toggle language">
+                    <span data-en="MM" data-my="EN">MM</span>
+                </button>
+            </div>
+            <div id="category-filter-bar" class="category-container">
+                <button class="category-btn active" data-category="All" data-en="All" data-my="အားလုံး">All</button>
+                <button class="category-btn" data-category="Beverages / Tea" data-en="Beverages / Tea" data-my="အဖျော်ယမကာ / လက်ဖက်ရည်">Beverages / Tea</button>
+                <button class="category-btn" data-category="Salads (Thoke)" data-en="Salads (Thoke)" data-my="သုပ်">Salads (Thoke)</button>
+                <button class="category-btn" data-category="Soups" data-en="Soups" data-my="ဟင်းချို">Soups</button>
+                <button class="category-btn" data-category="Curries (Meat & Fish)" data-en="Curries (Meat & Fish)" data-my="ဟင်းရည်">Curries (Meat & Fish)</button>
+                <button class="category-btn" data-category="Noodles & Rice Dishes" data-en="Noodles & Rice Dishes" data-my="ခေါက်ဆွဲနှင့် ထမင်းဟင်း">Noodles & Rice Dishes</button>
+                <button class="category-btn" data-category="Traditional Snacks / Street Food" data-en="Traditional Snacks / Street Food" data-my="ရိုးရာမုန့်/လမ်းဘေးအစားအစာ">Traditional Snacks / Street Food</button>
+                <button class="category-btn" data-category="Regional Specialties" data-en="Regional Specialties" data-my="ဒေသအစားအစာများ">Regional Specialties</button>
+            </div>
+        </div>
+
+        <!-- Recipe Grid -->
+        <div id="recipe-grid" class="recipe-grid">
+            <!-- Recipe cards will be injected here by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Recipe Modal -->
+    <div id="recipe-modal" class="modal">
+        <div class="modal-content">
+            <button id="close-modal-btn" class="modal-close-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" style="height: 1.5rem; width: 1.5rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div id="modal-content-body" style="margin-bottom: 1.5rem;">
+                <!-- Modal content will be dynamically injected here -->
+            </div>
+            <div style="display: flex; justify-content: flex-end;">
+                <button id="download-btn" class="btn btn-primary" data-en="Download Recipe" data-my="ချက်နည်းဖိုင်ဒေါင်းလုတ်ရန်">Download Recipe</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get references to key DOM elements
+            const recipeGrid = document.getElementById('recipe-grid');
+            const recipeModal = document.getElementById('recipe-modal');
+            const modalContentBody = document.getElementById('modal-content-body');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const startBtn = document.getElementById('start-btn');
+            const homeBtnDesktop = document.getElementById('home-btn-desktop');
+            const langToggleBtn = document.getElementById('lang-toggle-btn');
+            const categoryFilterBar = document.getElementById('category-filter-bar');
+            
+            let currentLang = 'en';
+            let currentRecipe = null;
+
+            // Centralized recipe data
+            const recipeData = [
+                // Category 1: Beverages / Tea
+                {
+                    title: { en: 'Milk Tea (Lahpet Yay)', my: 'လက်ဖက်ရည် (လက်ဖက်ရည်)' },
+                    category: { en: 'Beverages / Tea', my: 'အဖျော်ယမကာ / လက်ဖက်ရည်' },
+                    imgUrl: 'Tea.jpg',
+                    ingredients: [
+                        { en: 'Black tea leaves', my: 'လက်ဖက်ခြောက်' },
+                        { en: 'Water', my: 'ရေ' },
+                        { en: 'Sweetened condensed milk', my: 'နို့ဆီ' },
+                        { en: 'Sugar', my: 'သကြား' }
+                    ],
+                    cookingTime: '5–7 minutes',
+                    instructions: { en: '1. Boil water, add black tea leaves and simmer for 3–5 minutes. 2. Strain the tea into cups. 3. Add condensed milk and sugar, stir well. 4. Serve hot.', my: '1. ရေကိုဆူအောင်တည်၊ လက်ဖက်ခြောက်ထည့်ပြီး ၃-၅ မိနစ်မျှတည်ထားပါ။ 2. လက်ဖက်ရည်ကို ခွက်များထဲသို့စစ်ထည့်ပါ။ 3. နို့ဆီနှင့်သကြားထည့်ပြီး သမအောင်မွှေပါ။ 4. ပူပူလေးသောက်သုံးပါ။' },
+                    tips: { en: 'Use strong black tea for authentic flavor. Adjust sweetness to taste.', my: 'အရသာအစစ်အမှန်ရရန် လက်ဖက်ရည်အဖန်ကိုသုံးပါ။ အရသာပေါ်မူတည်၍ သကြားကိုထည့်ပါ။' }
+                },
+                {
+                    title: { en: 'Green Tea (Traditional)', my: 'လက်ဖက်စိမ်း (ရိုးရာ)' },
+                    category: { en: 'Beverages / Tea', my: 'အဖျော်ယမကာ / လက်ဖက်ရည်' },
+                    imgUrl: 'Greentea.jpg',
+                    ingredients: [
+                        { en: 'Green tea leaves', my: 'လက်ဖက်စိမ်း' },
+                        { en: 'Boiling water', my: 'ရေနွေးဆူ' },
+                        { en: 'Salt (optional)', my: 'ဆား (စိတ်ကြိုက်)' },
+                        { en: 'Lime (optional)', my: 'သံပရာသီး (စိတ်ကြိုက်)' }
+                    ],
+                    cookingTime: '5 minutes',
+                    instructions: { en: '1. Place tea leaves in a cup. 2. Pour hot water over leaves and steep for 3–5 minutes.', my: '1. ခွက်ထဲတွင် လက်ဖက်ခြောက်ထည့်ပါ။ 2. လက်ဖက်ခြောက်ပေါ်သို့ ရေနွေးပူပူလောင်းထည့်ပြီး ၃-၅ မိနစ်မျှနှပ်ထားပါ။' },
+                    tips: { en: 'Traditionally consumed in the morning as a refreshing drink.', my: 'ရိုးရာအစဉ်အလာအရ နံနက်ခင်းတွင်လန်းဆန်းသောသောက်စရာအဖြစ်သောက်သုံးလေ့ရှိသည်။' }
+                },
+                {
+                    title: { en: 'Burmese Coffee', my: 'မြန်မာ့ကော်ဖီ' },
+                    category: { en: 'Beverages / Tea', my: 'အဖျော်ယမကာ / လက်ဖက်ရည်' },
+                    imgUrl: 'coffee.jpg',
+                    ingredients: [
+                        { en: 'Coffee powder', my: 'ကော်ဖီမှုန့်' },
+                        { en: 'Hot water', my: 'ရေနွေး' },
+                        { en: 'Sweetened condensed milk', my: 'နို့ဆီ' }
+                    ],
+                    cookingTime: '5 minutes',
+                    instructions: { en: '1. Brew coffee powder with hot water. 2. Add condensed milk and stir well. 3. Serve hot.', my: '1. ကော်ဖီမှုန့်ကို ရေနွေးနှင့်ဖျော်ပါ။ 2. နို့ဆီထည့်ပြီး သမအောင်မွှေပါ။ 3. ပူပူလေးသောက်သုံးပါ။' },
+                    tips: { en: 'Strong coffee flavor is key; adjust milk according to taste.', my: 'ကော်ဖီအရသာပြင်းပြင်းသည်အဓိကဖြစ်သည်၊ အရသာပေါ်မူတည်၍ နို့ကိုချိန်ညှိပါ။' }
+                },
+
+                // Category 2: Salads (Thoke)
+                {
+                    title: { en: 'Tea Leaf Salad (Lahpet Thoke)', my: 'လက်ဖက်သုပ် (လက်ဖက်သုပ်)' },
+                    category: { en: 'Salads (Thoke)', my: 'အသုပ်' },
+                    imgUrl: 'Tea-Leaf-Salad.jpeg',
+                    ingredients: [
+                        { en: 'Fermented tea leaves', my: 'လက်ဖက်စို' },
+                        { en: 'Shredded cabbage', my: 'နုတ်နုတ်စဉ်းထားသောဂေါ်ဖီထုပ်' },
+                        { en: 'Roasted peanuts', my: 'မြေပဲလှော်' },
+                        { en: 'Fried garlic', my: 'ကြက်သွန်ဖြူဆီချက်' },
+                        { en: 'Sesame seeds', my: 'နှမ်း' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' },
+                        { en: 'Lime juice', my: 'သံပရာရည်' }
+                    ],
+                    cookingTime: '10 minutes',
+                    instructions: { en: '1. Soak shredded cabbage briefly in water, then drain. 2. Mix cabbage, tea leaves, peanuts, fried garlic, and sesame seeds. 3. Add fish sauce and lime juice, toss well. 4. Serve immediately.', my: '1. နုတ်နုတ်စဉ်းထားသောဂေါ်ဖီထုပ်ကို ရေတွင်ခဏစိမ်ပြီးရေစစ်ပါ။ 2. ဂေါ်ဖီထုပ်၊ လက်ဖက်၊ မြေပဲ၊ ကြက်သွန်ဖြူဆီချက်နှင့် နှမ်းတို့ကို ရောမွှေပါ။ 3. ငါးငံပြာရည်နှင့် သံပရာရည်ထည့်ပြီး သမအောင်မွှေပါ။ 4. ချက်ချင်းသောက်သုံးပါ။' },
+                    tips: { en: 'Serve fresh for best flavor; do not store for long.', my: 'အကောင်းဆုံးအရသာအတွက် လတ်လတ်ဆတ်ဆတ် သုံးဆောင်ပါ။ အကြာကြီးမထားပါနှင့်။' }
+                },
+                {
+                    title: { en: 'Tomato Salad', my: 'ခရမ်းချဉ်သီးသုပ်' },
+                    category: { en: 'Salads (Thoke)', my: 'အသုပ်' },
+                    imgUrl: 'tomato-salad.jfif',
+                    ingredients: [
+                        { en: 'Tomatoes', my: 'ခရမ်းချဉ်သီး' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Chili', my: 'ငရုတ်သီး' },
+                        { en: 'Lime juice', my: 'သံပရာရည်' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' },
+                        { en: 'Oil', my: 'ဆီ' }
+                    ],
+                    cookingTime: '10 minutes',
+                    instructions: { en: '1. Slice tomatoes and onions thinly. 2. Fry garlic and chili in oil briefly until fragrant. 3. Toss vegetables with fried garlic, lime juice, and fish sauce. 4. Serve chilled.', my: '1. ခရမ်းချဉ်သီးနှင့် ကြက်သွန်နီတို့ကို ပါးပါးလှီးပါ။ 2. ဆီထဲတွင် ကြက်သွန်ဖြူနှင့် ငရုတ်သီးကို အနံ့မွှေးလာသည်အထိ ခဏကြော်ပါ။ 3. ဟင်းသီးဟင်းရွက်များနှင့် ကြက်သွန်ဖြူကြော်၊ သံပရာရည်နှင့် ငါးငံပြာရည်တို့ကို ရောမွှေပါ။ 4. အအေးခံပြီး သုံးဆောင်ပါ။' },
+                    tips: { en: 'Adjust chili to your spice preference.', my: 'မိမိနှစ်သက်ရာအပူရှိန်ပေါ်မူတည်၍ ငရုတ်သီးကိုချိန်ညှိပါ။' }
+                },
+                {
+                    title: { en: 'Cucumber Salad', my: 'သခွားသီးသုပ်' },
+                    category: { en: 'Salads (Thoke)', my: 'အသုပ်' },
+                    imgUrl: 'cucumber salad.png',
+                    ingredients: [
+                        { en: 'Cucumber', my: 'သခွားသီး' },
+                        { en: 'Shallots', my: 'ကြက်သွန်နီသေး' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Chili', my: 'ငရုတ်သီး' },
+                        { en: 'Lime juice', my: 'သံပရာရည်' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' },
+                        { en: 'Oil', my: 'ဆီ' }
+                    ],
+                    cookingTime: '5 minutes',
+                    instructions: { en: '1. Mix cucumber, shallots, garlic, and chili in a bowl. 2. Add lime juice, fish sauce, and a little oil. 3. Toss well and serve immediately.', my: '1. ပန်းကန်လုံးထဲတွင် သခွားသီး၊ ကြက်သွန်နီသေး၊ ကြက်သွန်ဖြူနှင့် ငရုတ်သီးတို့ကို ရောထည့်ပါ။ 2. သံပရာရည်၊ ငါးငံပြာရည်နှင့် ဆီအနည်းငယ်ထည့်ပါ။ 3. သမအောင်မွှေပြီး ချက်ချင်းသုံးဆောင်ပါ။' },
+                    tips: { en: 'Best served fresh as a side dish for rice or curries.', my: 'ထမင်း သို့မဟုတ် ဟင်းလျာများအတွက် ဘေးထွက်ဟင်းပွဲအဖြစ် လတ်လတ်ဆတ်ဆတ်သုံးဆောင်ပါ။' }
+                },
+
+                // Category 3: Soups
+                {
+                    title: { en: 'Mohinga (Fish Soup with Rice Noodles)', my: 'မုန့်ဟင်းခါး (ငါးဟင်းရည်နှင့် ဆန်ခေါက်ဆွဲ)' },
+                    category: { en: 'Soups', my: 'ဟင်း' },
+                    imgUrl: 'monhinga.jpg',
+                    ingredients: [
+                        { en: 'Catfish or white fish', my: 'ငါးခူ သို့မဟုတ် ငါးဖြူ' },
+                        { en: 'Rice noodles', my: 'ဆန်ခေါက်ဆွဲ' },
+                        { en: 'Lemongrass', my: 'စပါးလင်' },
+                        { en: 'Ginger', my: 'ချင်း' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Turmeric powder', my: 'နနွင်းမှုန့်' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' },
+                        { en: 'Rice flour', my: 'ဆန်မှုန့်' },
+                        { en: 'Banana stem (optional)', my: 'ငှက်ပျောအူ (စိတ်ကြိုက်)' },
+                        { en: 'Oil', my: 'ဆီ' },
+                        { en: 'Water', my: 'ရေ' }
+                    ],
+                    cookingTime: '40 minutes',
+                    instructions: { en: '1. Boil fish with lemongrass, ginger, and onion to make stock. Remove fish bones. 2. Heat oil in a pan, fry garlic, onion, and turmeric until fragrant. 3. Add the fish stock back to the pan and mix in rice flour to thicken. 4. Add fish pieces and banana stem; simmer 5–10 minutes. 5. Boil rice noodles separately. Serve soup over noodles. 6. Garnish with fried chickpeas, coriander, or lime if desired.', my: '1. ငါးကို စပါးလင်၊ ချင်း၊ ကြက်သွန်နီတို့နှင့်အတူ ပြုတ်၍ ငါးရည်လုပ်ပါ။ ငါးရိုးများဖယ်ပါ။ 2. ဒယ်အိုးထဲတွင် ဆီအပူပေးပြီး ကြက်သွန်ဖြူ၊ ကြက်သွန်နီနှင့် နနွင်းမှုန့်တို့ကို အနံ့မွှေးလာသည်အထိကြော်ပါ။ 3. ငါးရည်ကို အိုးထဲသို့ပြန်ထည့်ပြီး အပျစ်ရစေရန် ဆန်မှုန့်ကိုထည့်မွှေပါ။ 4. ငါးဖတ်နှင့် ငှက်ပျောအူတို့ကို ထည့်ပြီး ၅-၁၀ မိနစ်ခန့်တည်ပါ။ 5. ဆန်ခေါက်ဆွဲကို သီးခြားပြုတ်ပါ။ ခေါက်ဆွဲပေါ်တွင် ဟင်းရည်လောင်း၍ သုံးဆောင်ပါ။ 6. လိုအပ်ပါက ပဲကြော်၊ နံနံပင် သို့မဟုတ် သံပရာသီးတို့ဖြင့် အလှဆင်ပါ။' },
+                    tips: { en: 'For authentic flavor, use river catfish if possible. Adjust thickness by adding or reducing rice flour.', my: 'အရသာအစစ်အမှန်အတွက် မြစ်ငါးခူကိုသုံးပါ။ ဆန်မှုန့်ကိုထည့်ခြင်းဖြင့် အပျစ်ကိုချိန်ညှိပါ။' }
+                },
+                {
+                    title: { en: 'Kyauk Hnget (Clear Chicken Soup)', my: 'ကြက်ဟင်းချိုကြည် (ကျောက်ငှက်)' },
+                    category: { en: 'Soups', my: 'ဟင်း' },
+                    imgUrl: 'Kyauk Hnget (Clear Chicken Soup).jpg',
+                    ingredients: [
+                        { en: 'Chicken', my: 'ကြက်သား' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Ginger', my: 'ချင်း' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' },
+                        { en: 'Oil', my: 'ဆီ' },
+                        { en: 'Water', my: 'ရေ' }
+                    ],
+                    cookingTime: '35 minutes',
+                    instructions: { en: '1. Heat oil, fry onion, garlic, and ginger until fragrant. 2. Add chicken pieces and brown lightly. 3. Add water and simmer for 25–30 minutes until chicken is cooked. 4. Season with fish sauce. Serve hot.', my: '1. ဆီအပူပေးပြီး ကြက်သွန်နီ၊ ကြက်သွန်ဖြူနှင့် ချင်းတို့ကို အနံ့မွှေးလာသည်အထိကြော်ပါ။ 2. ကြက်သားတုံးများထည့်ပြီး အနည်းငယ်အရောင်ရလာသည်အထိ ကြော်ပါ။ 3. ရေထည့်ပြီး ကြက်သားနူးသည်အထိ ၂၅-၃၀ မိနစ်ခန့်တည်ပါ။ 4. ငါးငံပြာရည်ဖြင့် အရသာထည့်ပါ။ ပူပူလေးသုံးဆောင်ပါ။' },
+                    tips: { en: 'Can add vegetables like carrots or cabbage for extra nutrition.', my: 'အာဟာရပိုရရန် မုန်လာဥနီ သို့မဟုတ် ဂေါ်ဖီထုပ်ကဲ့သို့သော ဟင်းသီးဟင်းရွက်များထည့်နိုင်သည်။' }
+                },
+
+                // Category 4: Curries (Meat & Fish)
+                {
+                    title: { en: 'Chicken Curry (Hnat)', my: 'ကြက်သားဟင်း (ဟင်းနက်)' },
+                    category: { en: 'Curries (Meat & Fish)', my: 'ဟင်း' },
+                    imgUrl: 'Chicken Curry (Hnat).jpg',
+                    ingredients: [
+                        { en: 'Chicken', my: 'ကြက်သား' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Ginger', my: 'ချင်း' },
+                        { en: 'Turmeric powder', my: 'နနွင်းမှုန့်' },
+                        { en: 'Chili powder', my: 'ငရုတ်သီးမှုန့်' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' },
+                        { en: 'Oil', my: 'ဆီ' },
+                        { en: 'Water', my: 'ရေ' }
+                    ],
+                    cookingTime: '30 minutes',
+                    instructions: { en: '1. Heat oil, fry onion, garlic, ginger, turmeric, and chili until aromatic. 2. Add chicken and stir until lightly browned. 3. Add water, cover, and simmer 20–25 minutes until chicken is tender. 4. Season with fish sauce. Serve with steamed rice.', my: '1. ဆီအပူပေးပြီး ကြက်သွန်နီ၊ ကြက်သွန်ဖြူ၊ ချင်း၊ နနွင်းနှင့် ငရုတ်သီးတို့ကို အနံ့မွှေးလာသည်အထိကြော်ပါ။ 2. ကြက်သားထည့်ပြီး အနည်းငယ်အရောင်ရလာသည်အထိမွှေပါ။ 3. ရေထည့်ပြီးအဖုံးအုပ်၍ ကြက်သားနူးသည်အထိ ၂၀-၂၅ မိနစ်ခန့်တည်ပါ။ 4. ငါးငံပြာရည်ဖြင့် အရသာထည့်ပါ။ ထမင်းပူပူဖြင့်သုံးဆောင်ပါ။' },
+                    tips: { en: 'For richer flavor, fry aromatics slowly. Adjust chili to taste.', my: 'ပိုမိုကြွယ်ဝသောအရသာအတွက် အနံ့မွှေးသည့်အရာများကို ဖြည်းဖြည်းကြော်ပါ။ အရသာပေါ်မူတည်၍ ငရုတ်သီးကိုချိန်ညှိပါ။' }
+                },
+                {
+                    title: { en: 'Pork Curry', my: 'ဝက်သားဟင်း' },
+                    category: { en: 'Curries (Meat & Fish)', my: 'ဟင်း' },
+                    imgUrl: 'Pork Curry.jpg',
+                    ingredients: [
+                        { en: 'Pork', my: 'ဝက်သား' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Ginger', my: 'ချင်း' },
+                        { en: 'Turmeric powder', my: 'နနွင်းမှုန့်' },
+                        { en: 'Chili powder', my: 'ငရုတ်သီးမှုန့်' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' },
+                        { en: 'Oil', my: 'ဆီ' },
+                        { en: 'Water', my: 'ရေ' }
+                    ],
+                    cookingTime: '35 minutes',
+                    instructions: { en: '1. Fry onion, garlic, and ginger in oil until fragrant. 2. Add pork and stir-fry until slightly browned. 3. Add water and simmer 25–30 minutes until tender. 4. Add turmeric, chili, and fish sauce; mix well.', my: '1. ဆီထဲတွင် ကြက်သွန်နီ၊ ကြက်သွန်ဖြူနှင့် ချင်းတို့ကို အနံ့မွှေးလာသည်အထိကြော်ပါ။ 2. ဝက်သားထည့်ပြီး အနည်းငယ်အရောင်ရလာသည်အထိကြော်ပါ။ 3. ရေထည့်ပြီး နူးညံ့သည်အထိ ၂၅-၃၀ မိနစ်ခန့်တည်ပါ။ 4. နနွင်း၊ ငရုတ်သီးနှင့် ငါးငံပြာရည်တို့ကိုထည့်ပြီး သမအောင်မွှေပါ။' },
+                    tips: { en: 'Use fatty cuts for richer taste.', my: 'ပိုမိုကြွယ်ဝသောအရသာအတွက် အဆီများသောအပိုင်းများကိုသုံးပါ။' }
+                },
+                {
+                    title: { en: 'Beef Curry', my: 'အမဲသားဟင်း' },
+                    category: { en: 'Curries (Meat & Fish)', my: 'ဟင်း' },
+                    imgUrl: 'Beef Curry.jfif',
+                    ingredients: [
+                        { en: 'Beef', my: 'အမဲသား' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Ginger', my: 'ချင်း' },
+                        { en: 'Turmeric powder', my: 'နနွင်းမှုန့်' },
+                        { en: 'Chili powder', my: 'ငရုတ်သီးမှုန့်' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' },
+                        { en: 'Oil', my: 'ဆီ' },
+                        { en: 'Water', my: 'ရေ' }
+                    ],
+                    cookingTime: '60 minutes',
+                    instructions: { en: '1. Fry aromatics in oil until fragrant. 2. Add beef, stir-fry lightly. 3. Cover with water and simmer 45–60 minutes until beef is tender. 4. Season with fish sauce.', my: '1. ဆီထဲတွင် အနံ့မွှေးသည့်အရာများ အနံ့မွှေးလာသည်အထိကြော်ပါ။ 2. အမဲသားထည့်ပြီး အနည်းငယ်ကြော်ပါ။ 3. ရေဖုံးအုပ်ပြီး အမဲသားနူးသည်အထိ ၄၅-၆၀ မိနစ်ခန့်တည်ပါ။ 4. ငါးငံပြာရည်ဖြင့် အရသာထည့်ပါ။' },
+                    tips: { en: 'Slow cooking is key for tender beef.', my: 'အမဲသားကို နူးညံ့စေရန်အတွက် ဖြည်းဖြည်းချက်ပြုတ်ခြင်းသည် အဓိကဖြစ်သည်။' }
+                },
+                {
+                    title: { en: 'Fish Curry', my: 'ငါးဟင်း' },
+                    category: { en: 'Curries (Meat & Fish)', my: 'ဟင်း' },
+                    imgUrl: 'Fish Curry.jpg',
+                    ingredients: [
+                        { en: 'Firm white fish', my: 'အသားမာသောငါးဖြူ' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Turmeric powder', my: 'နနွင်းမှုန့်' },
+                        { en: 'Chili powder', my: 'ငရုတ်သီးမှုန့်' },
+                        { en: 'Tomato', my: 'ခရမ်းချဉ်သီး' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' },
+                        { en: 'Oil', my: 'ဆီ' },
+                        { en: 'Water', my: 'ရေ' }
+                    ],
+                    cookingTime: '30 minutes',
+                    instructions: { en: '1. Optional: Lightly fry fish to hold shape. 2. Fry onion, garlic, turmeric, and chili in oil. 3. Add tomato and water, simmer 10–15 minutes. 4. Add fish and cook gently for 10 minutes. 5. Season with fish sauce.', my: '1. စိတ်ကြိုက်- ငါးကိုပုံမပျက်စေရန် အနည်းငယ်ကြော်ပါ။ 2. ဆီထဲတွင် ကြက်သွန်နီ၊ ကြက်သွန်ဖြူ၊ နနွင်းနှင့် ငရုတ်သီးတို့ကို ကြော်ပါ။ 3. ခရမ်းချဉ်သီးနှင့် ရေထည့်ပြီး ၁၀-၁၅ မိနစ်ခန့်တည်ပါ။ 4. ငါးထည့်ပြီး ၁၀ မိနစ်ခန့်ညင်သာစွာချက်ပါ။ 5. ငါးငံပြာရည်ဖြင့် အရသာထည့်ပါ။' },
+                    tips: { en: 'Use firm fish to avoid breaking during cooking.', my: 'ချက်ပြုတ်နေစဉ် အသားမပျက်စေရန်အတွက် အသားမာသောငါးကိုသုံးပါ။' }
+                },
+                {
+                    title: { en: 'Egg Curry', my: 'ကြက်ဥဟင်း' },
+                    category: { en: 'Curries (Meat & Fish)', my: 'ဟင်း' },
+                    imgUrl: 'Egg Curry.jfif',
+                    ingredients: [
+                        { en: 'Boiled eggs', my: 'ပြုတ်ထားသောကြက်ဥ' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Turmeric', my: 'နနွင်း' },
+                        { en: 'Chili powder', my: 'ငရုတ်သီးမှုန့်' },
+                        { en: 'Tomato', my: 'ခရမ်းချဉ်သီး' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' },
+                        { en: 'Oil', my: 'ဆီ' },
+                        { en: 'Water', my: 'ရေ' }
+                    ],
+                    cookingTime: '25 minutes',
+                    instructions: { en: '1. Fry aromatics in oil. 2. Add tomato and water; simmer 5 minutes. 3. Add boiled eggs, simmer 10 minutes. 4. Season with fish sauce.', my: '1. ဆီထဲတွင် အနံ့မွှေးသည့်အရာများကိုကြော်ပါ။ 2. ခရမ်းချဉ်သီးနှင့် ရေထည့်ပြီး ၅ မိနစ်ခန့်တည်ပါ။ 3. ပြုတ်ထားသောကြက်ဥများထည့်ပြီး ၁၀ မိနစ်ခန့်တည်ပါ။ 4. ငါးငံပြာရည်ဖြင့် အရသာထည့်ပါ။' },
+                    tips: { en: 'Optional: Lightly fry eggs before adding for extra flavor.', my: 'စိတ်ကြိုက်- အရသာပိုရရန် ကြက်ဥများကို မထည့်မီအနည်းငယ်ကြော်ပါ။' }
+                },
+
+                // Category 5: Noodles & Rice Dishes
+                {
+                    title: { en: 'Shan Noodles (Dry)', my: 'ရှမ်းခေါက်ဆွဲ (ခြောက်)' },
+                    category: { en: 'Noodles & Rice Dishes', my: 'ခေါက်ဆွဲနှင့် ထမင်းဟင်း' },
+                    imgUrl: 'Shan Noodles (Dry).jpg',
+                    ingredients: [
+                        { en: 'Thick round rice noodles', my: 'အလုံးထူဆန်ခေါက်ဆွဲ' },
+                        { en: 'Chicken or pork', my: 'ကြက်သား သို့မဟုတ် ဝက်သား' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Turmeric', my: 'နနွင်း' },
+                        { en: 'Chili powder', my: 'ငရုတ်သီးမှုန့်' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' },
+                        { en: 'Oil', my: 'ဆီ' },
+                        { en: 'Water', my: 'ရေ' }
+                    ],
+                    cookingTime: '25–30 minutes',
+                    instructions: { en: '1. Cook noodles in boiling water until soft; drain. 2. Fry garlic, onion, turmeric, and chili in oil until aromatic. 3. Add chicken or pork, stir-fry until cooked. 4. Add fish sauce and a little water to make a light sauce. 5. Toss noodles in the sauce and meat. 6. Serve hot, garnished with fried garlic or coriander.', my: '1. ခေါက်ဆွဲကို ရေနွေးဆူတွင် နူးသည်အထိပြုတ်ပြီးရေစစ်ပါ။ 2. ဆီထဲတွင် ကြက်သွန်ဖြူ၊ ကြက်သွန်နီ၊ နနွင်းနှင့် ငရုတ်သီးတို့ကို အနံ့မွှေးလာသည်အထိကြော်ပါ။ 3. ကြက်သား သို့မဟုတ် ဝက်သားထည့်ပြီး ကျက်သည်အထိကြော်ပါ။ 4. ငါးငံပြာရည်နှင့် ရေအနည်းငယ်ထည့်၍ အနှစ်ရည်လုပ်ပါ။ 5. ခေါက်ဆွဲကို အနှစ်ရည်နှင့် အသားတို့နှင့်အတူ ရောမွှေပါ။ 6. ကြက်သွန်ဖြူကြော် သို့မဟုတ် နံနံပင်ဖြင့် အလှဆင်ပြီး ပူပူလေးသုံးဆောင်ပါ။' },
+                    tips: { en: 'Use turmeric for authentic color; lightly fry noodles in oil before adding sauce for extra flavor.', my: 'အရောင်အစစ်အမှန်အတွက် နနွင်းကိုသုံးပါ။ အရသာပိုရရန် ဆော့စ်မထည့်မီ ခေါက်ဆွဲကို ဆီနှင့်အနည်းငယ်ကြော်ပါ။' }
+                },
+                {
+                    title: { en: 'Nan Gyi Thoke', my: 'နန်းကြီးသုပ်' },
+                    category: { en: 'Noodles & Rice Dishes', my: 'ခေါက်ဆွဲနှင့် ထမင်းဟင်း' },
+                    imgUrl: 'Nan Gyi Thoke.jpg',
+                    ingredients: [
+                        { en: 'Thick round rice noodles', my: 'အလုံးထူဆန်ခေါက်ဆွဲ' },
+                        { en: 'Chicken curry', my: 'ကြက်သားဟင်း' },
+                        { en: 'Boiled egg', my: 'ပြုတ်ထားသောကြက်ဥ' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Oil', my: 'ဆီ' },
+                        { en: 'Chili powder', my: 'ငရုတ်သီးမှုန့်' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' }
+                    ],
+                    cookingTime: '25 minutes',
+                    instructions: { en: '1. Boil noodles, drain, and place in a large bowl. 2. Add chicken curry and toss gently. 3. Slice boiled eggs and place on top. 4. Sprinkle fried onions, chili, and fish sauce. Serve immediately.', my: '1. ခေါက်ဆွဲကိုပြုတ်ပြီးရေစစ်ကာ ပန်းကန်လုံးကြီးထဲတွင်ထည့်ပါ။ 2. ကြက်သားဟင်းထည့်ပြီး ညင်သာစွာမွှေပါ။ 3. ပြုတ်ထားသောကြက်ဥကိုလှီးပြီးအပေါ်မှတင်ပါ။ 4. ကြက်သွန်ကြော်၊ ငရုတ်သီးနှင့် ငါးငံပြာရည်တို့ကိုဖြူးပါ။ ချက်ချင်းသုံးဆောင်ပါ။' },
+                    tips: { en: 'Balance the curry sauce so noodles are coated but not soggy.', my: 'ခေါက်ဆွဲပေါ်တွင် အရည်များစိုစွတ်မနေစေရန် ဟင်းရည်ကိုအချိုးကျအောင်လုပ်ပါ။' }
+                },
+                {
+                    title: { en: 'Khao Swè (Burmese Coconut Noodles)', my: 'ခေါက်ဆွဲ (မြန်မာ့အုန်းနို့ခေါက်ဆွဲ)' },
+                    category: { en: 'Noodles & Rice Dishes', my: 'ခေါက်ဆွဲနှင့် ထမင်းဟင်း' },
+                    imgUrl: 'Khao Swè (Burmese Coconut Noodles).jpg',
+                    ingredients: [
+                        { en: 'Egg noodles', my: 'ကြက်ဥခေါက်ဆွဲ' },
+                        { en: 'Chicken', my: 'ကြက်သား' },
+                        { en: 'Coconut milk', my: 'အုန်းနို့' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Turmeric', my: 'နနွင်း' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' },
+                        { en: 'Oil', my: 'ဆီ' }
+                    ],
+                    cookingTime: '30 minutes',
+                    instructions: { en: '1. Cook noodles in boiling water; drain. 2. Fry garlic, onion, and turmeric in oil until aromatic. 3. Add chicken and cook until tender. 4. Add coconut milk and fish sauce, simmer 5–10 minutes. 5. Serve noodles topped with the chicken-coconut sauce.', my: '1. ခေါက်ဆွဲကို ရေနွေးဆူတွင် ပြုတ်ပြီးရေစစ်ပါ။ 2. ဆီထဲတွင် ကြက်သွန်ဖြူ၊ ကြက်သွန်နီနှင့် နနွင်းတို့ကို အနံ့မွှေးလာသည်အထိကြော်ပါ။ 3. ကြက်သားထည့်ပြီး နူးညံ့သည်အထိချက်ပါ။ 4. အုန်းနို့နှင့် ငါးငံပြာရည်ထည့်ပြီး ၅-၁၀ မိနစ်ခန့်တည်ပါ။ 5. ခေါက်ဆွဲကို ကြက်သား-အုန်းနို့အနှစ်နှင့်အတူသုံးဆောင်ပါ။' },
+                    tips: { en: 'For richer flavor, use full-fat coconut milk.', my: 'ပိုမိုကြွယ်ဝသောအရသာအတွက် အဆီများသော အုန်းနို့ကိုသုံးပါ။' }
+                },
+                {
+                    title: { en: 'Burmese Fried Rice', my: 'မြန်မာ့ထမင်းကြော်' },
+                    category: { en: 'Noodles & Rice Dishes', my: 'ခေါက်ဆွဲနှင့် ထမင်းဟင်း' },
+                    imgUrl: 'Burmese Fried Rice.jpg',
+                    ingredients: [
+                        { en: 'Cooked rice', my: 'ချက်ထားသောထမင်း' },
+                        { en: 'Egg', my: 'ကြက်ဥ' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Carrots', my: 'မုန်လာဥနီ' },
+                        { en: 'Peas', my: 'ပဲသီး' },
+                        { en: 'Soy sauce', my: 'ပဲငံပြာရည်' },
+                        { en: 'Oil', my: 'ဆီ' },
+                        { en: 'Fish sauce', my: 'ငါးငံပြာရည်' }
+                    ],
+                    cookingTime: '20 minutes',
+                    instructions: { en: '1. Heat oil in a pan, fry garlic and onion until fragrant. 2. Add vegetables and cook for 2–3 minutes. 3. Push veggies to one side, scramble eggs. 4. Add rice, soy sauce, and fish sauce, stir-fry 5–7 minutes. 5. Serve hot.', my: '1. ဒယ်အိုးတွင် ဆီအပူပေးပြီး ကြက်သွန်ဖြူနှင့် ကြက်သွန်နီကို အနံ့မွှေးလာသည်အထိကြော်ပါ။ 2. ဟင်းသီးဟင်းရွက်များထည့်ပြီး ၂-၃ မိနစ်ခန့်ကြော်ပါ။ 3. ဟင်းသီးဟင်းရွက်များကို တစ်ဖက်သို့တွန်း၍ ကြက်ဥကိုမွှေပါ။ 4. ထမင်း၊ ပဲငံပြာရည်နှင့် ငါးငံပြာရည်ထည့်ပြီး ၅-၇ မိနစ်ခန့်ကြော်ပါ။ 5. ပူပူလေးသုံးဆောင်ပါ။' },
+                    tips: { en: 'Use day-old rice for best texture.', my: 'အကောင်းဆုံးအရသာအတွက် တစ်ရက်သားထမင်းကိုသုံးပါ။' }
+                },
+
+                // Category 6: Traditional Snacks / Street Food
+                {
+                    title: { en: 'Samusa (Burmese Samosa)', my: 'ဆမူဆာ (မြန်မာ့ဆမူဆာ)' },
+                    category: { en: 'Traditional Snacks / Street Food', my: 'ရိုးရာမုန့်/လမ်းဘေးအစားအစာ' },
+                    imgUrl: 'Samusa (Burmese Samosa).jfif',
+                    ingredients: [
+                        { en: 'All-purpose flour', my: 'ဂျုံမှုန့်' },
+                        { en: 'Water', my: 'ရေ' },
+                        { en: 'Potatoes', my: 'အာလူး' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Peas', my: 'ပဲသီး' },
+                        { en: 'Oil', my: 'ဆီ' },
+                        { en: 'Salt', my: 'ဆား' },
+                        { en: 'Chili', my: 'ငရုတ်သီး' }
+                    ],
+                    cookingTime: '45 minutes',
+                    instructions: { en: '1. Make dough with flour and water; let rest 20 minutes. 2. Prepare filling: mix mashed potatoes, onion, peas, peas, salt, chili. 3. Roll dough into small circles, fill with potato mixture, fold into triangles. 4. Deep-fry until golden brown.', my: '1. ဂျုံမှုန့်နှင့်ရေကို ရော၍မုန့်သားလုပ်ပါ၊ မိနစ် ၂၀ ခန့်အနားပေးပါ။ 2. အစာသွတ်ရန်: အာလူးထောင်း၊ ကြက်သွန်နီ၊ ပဲသီး၊ ဆား၊ ငရုတ်သီးတို့ကို ရောပါ။ 3. မုန့်သားကို အဝိုင်းငယ်များဖြစ်အောင် လှိမ့်ပြီး အာလူးအရောအနှောထည့်ကာ တြိဂံပုံခေါက်ပါ။ 4. ရွှေအိုရောင်ဖြစ်လာသည်အထိ ဆီပူပူတွင်ကြော်ပါ။' },
+                    tips: { en: 'Fry at medium heat to cook evenly. Serve with chutney or sauce.', my: 'အညီအမျှကျက်စေရန် အလယ်အလတ်အပူဖြင့်ကြော်ပါ။ ငရုတ်သီးချက် သို့မဟုတ် ဆော့စ်ဖြင့်သုံးဆောင်ပါ။' }
+                },
+                {
+                    title: { en: 'Pea Fritters (Pe Byok)', my: 'ပဲပြုတ်ကြော် (ပဲပြုတ်)' },
+                    category: { en: 'Traditional Snacks / Street Food', my: 'ရိုးရာမုန့်/လမ်းဘေးအစားအစာ' },
+                    imgUrl: 'Pea Fritters (Pe Byok).jpg',
+                    ingredients: [
+                        { en: 'Yellow split peas', my: 'ပဲဝါခြမ်း' },
+                        { en: 'Onion', my: 'ကြက်သွန်နီ' },
+                        { en: 'Garlic', my: 'ကြက်သွန်ဖြူ' },
+                        { en: 'Chili', my: 'ငရုတ်သီး' },
+                        { en: 'Salt', my: 'ဆား' },
+                        { en: 'Oil', my: 'ဆီ' }
+                    ],
+                    cookingTime: '40 minutes',
+                    instructions: { en: '1. Soak split peas 2–3 hours, drain. 2. Mix peas with onion, garlic, chili, and salt to form a batter. 3. Heat oil, drop spoonfuls of batter, fry until golden. 4. Drain excess oil and serve hot.', my: '1. ပဲဝါခြမ်းကို ၂-၃ နာရီခန့်စိမ်ပြီး ရေစစ်ပါ။ 2. ပဲများကို ကြက်သွန်နီ၊ ကြက်သွန်ဖြူ၊ ငရုတ်သီးနှင့် ဆားတို့နှင့် ရော၍ မုန့်နှစ်လုပ်ပါ။ 3. ဆီအပူပေးပြီး မုန့်နှစ်ကို ဇွန်းဖြင့်ချ၍ ရွှေရောင်ဖြစ်လာသည်အထိကြော်ပါ။ 4. ပိုလျှံနေသောဆီကိုစစ်ပြီး ပူပူလေးသုံးဆောင်ပါ။' },
+                    tips: { en: 'Can add chopped coriander for extra flavor.', my: 'အရသာပိုရရန် နံနံပင်စိမ်းကို လှီး၍ထည့်နိုင်သည်။' }
+                },
+                {
+                    title: { en: 'Mont Lone Yay Paw (Sweet Rice Balls)', my: 'မုန့်လုံးရေပေါ် (ချိုမြိန်သောဆန်လုံး)' },
+                    category: { en: 'Traditional Snacks / Street Food', my: 'ရိုးရာမုန့်/လမ်းဘေးအစားအစာ' },
+                    imgUrl: 'Mont Lone Yay Paw (Sweet Rice Balls).jpg',
+                    ingredients: [
+                        { en: 'Glutinous rice flour', my: 'ကောက်ညှင်းမှုန့်' },
+                        { en: 'Jaggery', my: 'ထန်းလျက်' },
+                        { en: 'Water', my: 'ရေ' }
+                    ],
+                    cookingTime: '25 minutes',
+                    instructions: { en: '1. Mix rice flour and water to form a dough. 2. Divide dough into small balls, insert jaggery in the center, seal. 3. Boil water in a pot, drop balls in, cook until they float (5–7 minutes). 4. Drain and serve warm.', my: '1. ကောက်ညှင်းမှုန့်နှင့် ရေကို ရော၍ မုန့်သားလုပ်ပါ။ 2. မုန့်သားကို အလုံးငယ်များဖြစ်အောင်ခွဲ၍ အလယ်တွင် ထန်းလျက်ကိုထည့်ပြီး ပိတ်ပါ။ 3. အိုးထဲတွင် ရေကိုဆူအောင်တည်ပြီး အလုံးများကိုထည့်ကာ ပေါလောပေါ်သည်အထိ (၅-၇ မိနစ်) ချက်ပါ။ 4. ရေစစ်ပြီး နွေးနွေးလေးသုံးဆောင်ပါ။' },
+                    tips: { en: 'Serve with grated coconut for extra sweetness.', my: 'ပိုမိုချိုမြိန်စေရန် အုန်းသီးခြစ်ဖြင့်သုံးဆောင်ပါ။' }
+                },
+                {
+                    title: { en: 'Shwe Yin Aye (Coconut Dessert)', my: 'ရွှေရင်အေး (အုန်းနို့အချိုပွဲ)' },
+                    category: { en: 'Traditional Snacks / Street Food', my: 'ရိုးရာမုန့်/လမ်းဘေးအစားအစာ' },
+                    imgUrl: 'Shwe Yin Aye (Coconut Dessert).jpg',
+                    ingredients: [
+                        { en: 'Coconut milk', my: 'အုန်းနို့' },
+                        { en: 'Sago', my: 'စားကူ' },
+                        { en: 'Bread jelly', my: 'ပေါင်မုန့်ဂျယ်လီ' },
+                        { en: 'Sugar', my: 'သကြား' },
+                        { en: 'Ice cubes', my: 'ရေခဲတုံး' }
+                    ],
+                    cookingTime: '20 minutes',
+                    instructions: { en: '1. Boil sago until translucent; drain. 2. Mix coconut milk and sugar, heat slightly. 3. In serving bowls, layer sago, bread jelly, coconut milk. 4. Add ice cubes and serve chilled.', my: '1. စားကူကိုကြည်လင်လာသည်အထိပြုတ်ပြီး ရေစစ်ပါ။ 2. အုန်းနို့နှင့်သကြားကို ရောပြီး အနည်းငယ်အပူပေးပါ။ 3. သုံးဆောင်မည့်ပန်းကန်လုံးများတွင် စားကူ၊ ပေါင်မုန့်ဂျယ်လီ၊ အုန်းနို့တို့ကိုအဆင့်ဆင့်ထည့်ပါ။ 4. ရေခဲတုံးများထည့်ပြီး အေးမြစွာသုံးဆောင်ပါ။' },
+                    tips: { en: 'Can add pandan jelly or tapioca pearls for variation.', my: 'ကွဲပြားသောအရသာအတွက် ပန်ဒန်ဂျယ်လီ သို့မဟုတ် မျောက်ဥများကိုထည့်နိုင်သည်။' }
+                },
+            ];
+
+            // Translation data for static text
+            const translations = {
+                'Creator: Htoo Aung Hlaing Win | ID: 240702403787': { en: 'Creator: Htoo Aung Hlaing Win | ID: 240702403787', my: 'ဖန်တီးသူ: ထူးအောင်လှိုင်ဝင်း | ID: 240702403787' },
+                'Myanmar Food Guide': { en: 'Myanmar Food Guide', my: 'မြန်မာ့အစားအစာလမ်းညွှန်'},
+                'Discover the rich and delicious world of Myanmar cuisine.': { en: 'Discover the rich and delicious world of Myanmar cuisine.', my: 'မြန်မာ့အစားအစာရဲ့ ကြွယ်ဝပြီး အရသာရှိတဲ့ကမ္ဘာကို ရှာဖွေလိုက်ပါ။' },
+                'Get Started': { en: 'Get Started', my: 'စတင်လိုက်ပါ' },
+                'Home': { en: 'Home', my: 'မူလစာမျက်နှာ' },
+                'Download Recipe': { en: 'Download Recipe', my: 'ချက်နည်းဖိုင်ဒေါင်းလုတ်ရန်' },
+                'MM': { en: 'MM', my: 'EN' },
+                'EN': { en: 'EN', my: 'MM' },
+                'All': { en: 'All', my: 'အားလုံး' },
+                'Beverages / Tea': { en: 'Beverages / Tea', my: 'အဖျော်ယမကာ / လက်ဖက်ရည်' },
+                'Salads (Thoke)': { en: 'Salads (Thoke)', my: 'သုပ်' },
+                'Soups': { en: 'Soups', my: 'ဟင်းချို' },
+                'Curries (Meat & Fish)': { en: 'Curries (Meat & Fish)', my: 'ဟင်းရည်' },
+                'Noodles & Rice Dishes': { en: 'Noodles & Rice Dishes', my: 'ခေါက်ဆွဲနှင့် ထမင်းဟင်း' },
+                'Traditional Snacks / Street Food': { en: 'Traditional Snacks / Street Food', my: 'ရိုးရာမုန့်/လမ်းဘေးအစားအစာ' },
+                'Regional Specialties': { en: 'Regional Specialties', my: 'ဒေသအစားအစာများ' },
+                'Ingredients': { en: 'Ingredients', my: 'ပါဝင်ပစ္စည်းများ' },
+                'How to Cook': { en: 'How to Cook', my: 'ချက်ပြုတ်နည်း' },
+                'Tips': { en: 'Tips', my: 'အကြံပြုချက်' },
+                'Cooking Time': { en: 'Cooking Time', my: 'ချက်ပြုတ်ချိန်' },
+                'No recipes found.': { en: 'No recipes found.', my: 'ဟင်းပွဲများမတွေ့ရှိပါ။' }
+            };
+
+            // Helper function to get the correct translation
+            const getTranslation = (textObj) => {
+                if (typeof textObj === 'string') {
+                    // Handle static text
+                    return translations[textObj] ? translations[textObj][currentLang] : textObj;
+                } else if (textObj && textObj[currentLang]) {
+                    // Handle dynamic text from recipe data
+                    return textObj[currentLang];
+                }
+                return '';
+            };
+
+            // Renders recipe cards based on a given array of recipes
+            const renderRecipes = (filteredRecipes = recipeData) => {
+                recipeGrid.innerHTML = ''; // Clear previous recipes
+                if (filteredRecipes.length === 0) {
+                    recipeGrid.innerHTML = `<p style="grid-column: 1 / -1; color: #a1a1aa; text-align: center;" data-key="No recipes found.">${getTranslation('No recipes found.')}</p>`;
+                } else {
+                    filteredRecipes.forEach(recipe => {
+                        const card = document.createElement('div');
+                        card.className = 'recipe-card';
+                        card.innerHTML = `
+                            <img src="${recipe.imgUrl}" alt="${getTranslation(recipe.title)}" class="recipe-card-img">
+                            <div style="padding: 1rem; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <h3 class="font-playfair" style="font-size: 1.125rem; font-weight: 600;" data-key="${getTranslation(recipe.title)}">${getTranslation(recipe.title)}</h3>
+                                <p style="font-size: 0.875rem; color: #a1a1aa; flex-grow: 1;" data-key="${getTranslation(recipe.category)}">${getTranslation(recipe.category)}</p>
+                            </div>
+                        `;
+                        // Attach a click listener to show recipe details
+                        card.addEventListener('click', () => showRecipeDetails(recipe));
+                        recipeGrid.appendChild(card);
+                    });
+                }
+            };
+
+            // Populates and shows the recipe modal
+            const showRecipeDetails = (recipe) => {
+                currentRecipe = recipe; // Store the current recipe for downloading
+                modalContentBody.innerHTML = `
+                    <div style="width: 100%; height: 16rem; overflow: hidden; margin-bottom: 1.5rem; border-radius: 0.75rem;">
+                        <img src="${recipe.imgUrl}" alt="${getTranslation(recipe.title)}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <h2 class="font-playfair" style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;" data-key="${getTranslation(recipe.title)}">${getTranslation(recipe.title)}</h2>
+                    <p style="color: #78716c; font-size: 0.875rem; margin-bottom: 1rem;">
+                        <span style="font-weight: 600;" data-key="Cooking Time">${getTranslation('Cooking Time')}:</span> ${recipe.cookingTime}
+                    </p>
+
+                    <h3 class="font-playfair" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;" data-key="Ingredients">${getTranslation('Ingredients')}</h3>
+                    <ul style="list-style-type: disc; padding-left: 1.5rem; color: #525252; margin-bottom: 1rem;">
+                        ${recipe.ingredients.map(ingredient => `<li data-key="${getTranslation(ingredient)}">${getTranslation(ingredient)}</li>`).join('')}
+                    </ul>
+
+                    <h3 class="font-playfair" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;" data-key="How to Cook">${getTranslation('How to Cook')}</h3>
+                    <p style="color: #525252; margin-bottom: 1rem;" data-key="${getTranslation(recipe.instructions)}">${getTranslation(recipe.instructions)}</p>
+
+                    ${recipe.tips ? `<h3 class="font-playfair" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;" data-key="Tips">${getTranslation('Tips')}</h3>
+                    <p style="color: #525252;" data-key="${getTranslation(recipe.tips)}">${getTranslation(recipe.tips)}</p>` : ''}
+                `;
+                recipeModal.classList.add('open');
+            };
+
+            // Filters recipes based on category
+            const filterRecipes = (category) => {
+                const filtered = category === 'All' ? recipeData : recipeData.filter(recipe => getTranslation(recipe.category) === category);
+                renderRecipes(filtered);
+            };
+
+            // Updates all visible text based on the current language
+            const updateTextForLanguage = () => {
+                document.querySelectorAll('[data-en]').forEach(element => {
+                    const enText = element.getAttribute('data-en');
+                    const myText = element.getAttribute('data-my');
+                    element.textContent = currentLang === 'en' ? enText : myText;
+                });
+                document.querySelectorAll('[data-key]').forEach(element => {
+                    const key = element.getAttribute('data-key');
+                    element.textContent = getTranslation(key);
+                });
+            };
+
+            // Toggles between English and Myanmar languages
+            const toggleLanguage = () => {
+                currentLang = currentLang === 'en' ? 'my' : 'en';
+                updateTextForLanguage();
+                const activeCategory = document.querySelector('.category-btn.active').getAttribute('data-category');
+                filterRecipes(activeCategory);
+            };
+
+            // Shows the specified view and hides all others
+            const showView = (viewId) => {
+                document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+                document.getElementById(viewId).classList.add('active');
+            };
+
+            const setActiveCategory = (category) => {
+                document.querySelector('.category-btn.active')?.classList.remove('active');
+                const btn = document.querySelector(`.category-btn[data-category="${category}"]`);
+                if (btn) {
+                    btn.classList.add('active');
+                }
+            };
+
+            // Function to generate a PNG image for download
+            const downloadRecipeAsImage = async () => {
+                if (!currentRecipe) return;
+
+                const modalBody = modalContentBody;
+                
+                // Temporarily apply styles for better image generation
+                const originalStyle = modalBody.style.cssText;
+                modalBody.style.backgroundColor = '#fefcf5';
+                modalBody.style.color = '#4a2c2a';
+
+                try {
+                    const canvas = await html2canvas(modalBody, {
+                        scale: 2, // Improve image quality
+                        useCORS: true,
+                    });
+                    
+                    const image = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.download = `${getTranslation(currentRecipe.title).replace(/[^a-z0-9]/gi, '_').toLowerCase()}.png`;
+                    link.href = image;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } catch (error) {
+                    console.error('Failed to generate image:', error);
+                } finally {
+                    // Restore original styles
+                    modalBody.style.cssText = originalStyle;
+                }
+            };
+
+            // --- Event Listeners ---
+            
+            // Navigate to recipes view on button click
+            startBtn.addEventListener('click', () => {
+                showView('recipes-view');
+                renderRecipes();
+            });
+
+            // Navigate back to home view
+            homeBtnDesktop.addEventListener('click', () => {
+                 showView('home-view');
+            });
+
+            // Trigger the browser's download
+            downloadBtn.addEventListener('click', downloadRecipeAsImage);
+
+            // Close the recipe modal
+            closeModalBtn.addEventListener('click', () => {
+                recipeModal.classList.remove('open');
+            });
+
+            // Handle category button clicks
+            categoryFilterBar.addEventListener('click', (e) => {
+                if (e.target.classList.contains('category-btn')) {
+                    const category = e.target.getAttribute('data-category');
+                    setActiveCategory(category);
+                    filterRecipes(category);
+                }
+            });
+
+            // Toggle language on button click
+            langToggleBtn.addEventListener('click', toggleLanguage);
+
+            // Initial setup
+            updateTextForLanguage();
+        });
+    </script>
+</body>
+</html>
